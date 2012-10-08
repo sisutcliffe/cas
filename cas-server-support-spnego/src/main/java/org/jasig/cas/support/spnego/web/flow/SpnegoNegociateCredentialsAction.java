@@ -21,6 +21,9 @@ package org.jasig.cas.support.spnego.web.flow;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +37,8 @@ import org.springframework.webflow.execution.RequestContext;
 
 /**
  * First action of a SPNEGO flow : negociation.<br/> The server checks if the
- * negociation string is in the request header and this is a supported browser:
+ * negociation string is in the request header, this is a supported browser and
+ * we're on a network that we can do negociate auth in:
  * <ul>
  * <li>If found do nothing and return <code>success()</code></li>
  * <li>else add a WWW-Authenticate response header and a 401 response status,
@@ -55,6 +59,8 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
 
     private List<String> supportedBrowser;
 
+    private String netmask;
+
     private String messageBeginPrefix = constructMessagePrefix();
 
     protected Event doExecute(RequestContext context) {
@@ -67,7 +73,7 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
         final String userAgent = request
             .getHeader(SpnegoConstants.HEADER_USER_AGENT);
 
-        if (StringUtils.hasText(userAgent) && isSupportedBrowser(userAgent)) {
+        if (StringUtils.hasText(userAgent) && isSupportedBrowser(userAgent) && isInNetwork(request.getRemoteAddr())) {
             if (!StringUtils.hasText(authorizationHeader)
                 || !authorizationHeader.startsWith(this.messageBeginPrefix)
                 || authorizationHeader.length() <= this.messageBeginPrefix
@@ -97,12 +103,19 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
         this.supportedBrowser = supportedBrowser;
     }
 
+    public void setNetmask(final String netmask) {
+        this.netmask = netmask;
+    }
+
     public void afterPropertiesSet() throws Exception {
         if (this.supportedBrowser == null) {
             this.supportedBrowser = new ArrayList<String>();
             this.supportedBrowser.add("MSIE");
             this.supportedBrowser.add("Firefox");
             this.supportedBrowser.add("AppleWebKit");
+        }
+        if (this.netmask == null) {
+            this.netmask = "0.0.0.0";
         }
     }
 
@@ -118,5 +131,18 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
             }
         }
         return false;
+    }
+
+    protected boolean isInNetwork(final String requestor) {
+        try {
+            byte[] server = InetAddress.getLocalHost().getAddress();
+            byte[] client = InetAddress.getByName(requestor).getAddress();
+            byte[] netmask = InetAddress.getByName(this.netmask).getAddress();
+
+            for (int i = 0; i < server.length; i++)
+               if ((server[i] & netmask[i]) != (client[i] & netmask[i]))
+                  return false;
+        } catch(UnknownHostException e) {}
+        return true;
     }
 }
