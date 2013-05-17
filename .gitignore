@@ -3,6 +3,8 @@
 .project
 .settings
 target
+test-output/
+bin/
 *.ipr
 *.iml
 *.iws
@@ -12,3 +14,5 @@ target
 overlays/
 pom.xml.versionsBackup
 *.log
+
+**/.checkstyle

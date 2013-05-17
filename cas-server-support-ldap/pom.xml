@@ -79,12 +79,11 @@
       <scope>test</scope>
     </dependency>
 
-	<dependency>
-		<groupId>joda-time</groupId>
-		<artifactId>joda-time</artifactId>
-		<version>2.1</version>
-		<scope>compile</scope>
-	</dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   
   <build>
@@ -107,5 +106,9 @@
       </plugin>
     </plugins>
   </build>
+
+  <properties>
+    <cs.dir>${project.parent.basedir}</cs.dir>
+  </properties>
   
 </project>

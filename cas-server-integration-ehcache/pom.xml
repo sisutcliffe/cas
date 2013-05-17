@@ -31,8 +31,7 @@
   <dependencies>    
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>2.6.0</version>
+      <artifactId>ehcache</artifactId>
     </dependency>   
     <dependency>         
       <groupId>org.jasig.cas</groupId>         
@@ -88,4 +87,8 @@
       </roles>
     </contributor>
   </contributors>
+
+  <properties>
+    <cs.dir>${project.parent.basedir}</cs.dir>
+  </properties>
 </project>

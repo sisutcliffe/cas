@@ -26,26 +26,24 @@ import java.util.List;
 import java.util.Map;
 
 import com.esotericsoftware.kryo.Kryo;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Unit test for {@link AttributeMapSerializer} class.
  *
  * @author Marvin S. Addison
- * @version $Revision: $
  */
 @RunWith(Parameterized.class)
 public class AttributeMapSerializerTests {
-    private final Log logger = LogFactory.getLog(getClass());
-  
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, Object> attributes;
-    
+
     public AttributeMapSerializerTests(final Map<String, Object> attributes) {
         this.attributes = attributes;
     }
@@ -56,31 +54,40 @@ public class AttributeMapSerializerTests {
         Map<String, Object> attrMap;
 
         // Test case #1: single-valued attribute
-        attrMap = new LinkedHashMap<String, Object>() {{
-            put("altUsername", "fhqwhgads");
-        }};
-        params.add(new Object[] { attrMap });
+        attrMap = new LinkedHashMap<String, Object>() {
+            private static final long serialVersionUID = 1L;
+
+            {
+                put("altUsername", "fhqwhgads");
+            }
+        };
+        params.add(new Object[] {attrMap});
 
         // Test case #2: multi-valued attribute
         final List<String> names = new ArrayList<String>(3);
         names.add("strongbad");
         names.add("homsar");
         names.add("eh-steve");
-        attrMap = new LinkedHashMap<String, Object>() {{
-            put("altUsernames", names);
-        }};
-        params.add(new Object[] { attrMap });
-
+        attrMap = new LinkedHashMap<String, Object>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put("altUsernames", names);
+            }
+        };
+        params.add(new Object[] {attrMap});
 
         // Test case #3: null attribute
-        attrMap = new LinkedHashMap<String, Object>() {{
-            put("altUsername", null);
-        }};
-        params.add(new Object[] { attrMap });
+        attrMap = new LinkedHashMap<String, Object>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put("altUsername", null);
+            }
+        };
+        params.add(new Object[] {attrMap});
 
         return params;
     }
-    
+
     @Test
     public void testReadWrite() throws Exception {
         final Kryo kryo = new Kryo();
@@ -93,13 +100,13 @@ public class AttributeMapSerializerTests {
         printBuffer(buffer);
         Assert.assertEquals(this.attributes, serializer.read(buffer));
     }
-    
+
     private void printBuffer(final ByteBuffer buffer) {
         final byte[] bytes = new byte[buffer.limit()];
         buffer.get(bytes);
         try {
             logger.debug(new String(bytes, "UTF-8"));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.error("Error printing buffer as string.");
         }
         buffer.rewind();

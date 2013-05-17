@@ -18,96 +18,90 @@
  */
 package org.jasig.cas.support.oauth.web;
 
-import java.util.Collection;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.jasig.cas.services.RegisteredService;
 import org.jasig.cas.services.ServicesManager;
 import org.jasig.cas.support.oauth.OAuthConstants;
 import org.jasig.cas.support.oauth.OAuthUtils;
+import org.jasig.cas.support.oauth.services.OAuthRegisteredService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 /**
- * This controller is in charge of responding to the authorize call in OAuth protocol. It stores the callback url and redirects user to the
+ * This controller is in charge of responding to the authorize
+ * call in OAuth protocol. It stores the callback url and redirects user to the
  * login page with the callback service.
- * 
+ *
  * @author Jerome Leleu
  * @since 3.5.0
  */
 public final class OAuth20AuthorizeController extends AbstractController {
-    
-    private static final Logger logger = LoggerFactory.getLogger(OAuth20AuthorizeController.class);
-    
+
+    private static Logger LOGGER = LoggerFactory.getLogger(OAuth20AuthorizeController.class);
+
     private final String loginUrl;
-    
+
     private final ServicesManager servicesManager;
-    
+
     public OAuth20AuthorizeController(final ServicesManager servicesManager, final String loginUrl) {
         this.servicesManager = servicesManager;
         this.loginUrl = loginUrl;
     }
-    
+
     @Override
     protected ModelAndView handleRequestInternal(final HttpServletRequest request, final HttpServletResponse response)
-        throws Exception {
-        
-        String redirectUri = request.getParameter(OAuthConstants.REDIRECT_URI);
-        logger.debug("redirect_uri : {}", redirectUri);
-        String clientId = request.getParameter(OAuthConstants.CLIENT_ID);
-        logger.debug("clientId : {}", clientId);
-        String clientSecret = request.getParameter(OAuthConstants.CLIENT_SECRET);
-        logger.debug("clientSecret : {}", clientSecret);
-        
+            throws Exception {
+
+        final String clientId = request.getParameter(OAuthConstants.CLIENT_ID);
+        LOGGER.debug("{} : {}", OAuthConstants.CLIENT_ID, clientId);
+
+        final String redirectUri = request.getParameter(OAuthConstants.REDIRECT_URI);
+        LOGGER.debug("{} : {}", OAuthConstants.REDIRECT_URI, redirectUri);
+
+        final String state = request.getParameter(OAuthConstants.STATE);
+        LOGGER.debug("{} : {}", OAuthConstants.STATE, state);
+
         // clientId is required
         if (StringUtils.isBlank(clientId)) {
-            logger.error("missing clientId");
+            LOGGER.error("Missing {}", OAuthConstants.CLIENT_ID);
             return new ModelAndView(OAuthConstants.ERROR_VIEW);
         }
         // redirectUri is required
         if (StringUtils.isBlank(redirectUri)) {
-            logger.error("missing redirectUri");
+            LOGGER.error("Missing {}", OAuthConstants.REDIRECT_URI);
             return new ModelAndView(OAuthConstants.ERROR_VIEW);
         }
-        
-        // name of the CAS service
-        Collection<RegisteredService> services = servicesManager.getAllServices();
-        RegisteredService service = null;
-        for (RegisteredService aService : services) {
-            if (StringUtils.equals(aService.getName(), clientId)) {
-                service = aService;
-                break;
-            }
-        }
+
+        final OAuthRegisteredService service = OAuthUtils.getRegisteredOAuthService(this.servicesManager, clientId);
         if (service == null) {
-            logger.error("Unknown clientId : {}", clientId);
+            LOGGER.error("Unknown {} : {}", OAuthConstants.CLIENT_ID, clientId);
             return new ModelAndView(OAuthConstants.ERROR_VIEW);
         }
-        
-        String serviceId = service.getServiceId();
-        // redirectUri should start with serviceId
-        if (!StringUtils.startsWith(redirectUri, serviceId)) {
-            logger.error("Unsupported redirectUri : {} for serviceId : {}", redirectUri, serviceId);
+
+        final String serviceId = service.getServiceId();
+        if (!redirectUri.matches(serviceId)) {
+            LOGGER.error("Unsupported {} : {} for serviceId : {}", OAuthConstants.REDIRECT_URI, redirectUri, serviceId);
             return new ModelAndView(OAuthConstants.ERROR_VIEW);
         }
-        
-        // keep redirectUri in session
-        HttpSession session = request.getSession();
+
+        // keep info in session
+        final HttpSession session = request.getSession();
         session.setAttribute(OAuthConstants.OAUTH20_CALLBACKURL, redirectUri);
-        session.setAttribute(OAuthConstants.OAUTH20_SERVICE_NAME, service.getTheme());
-        
-        String callbackAuthorizeUrl = request.getRequestURL().toString()
-            .replace("/" + OAuthConstants.AUTHORIZE_URL, "/" + OAuthConstants.CALLBACK_AUTHORIZE_URL);
-        logger.debug("callbackAuthorizeUrl : {}", callbackAuthorizeUrl);
-        
-        String loginUrlWithService = OAuthUtils.addParameter(loginUrl, OAuthConstants.SERVICE, callbackAuthorizeUrl);
-        logger.debug("loginUrlWithService : {}", loginUrlWithService);
+        session.setAttribute(OAuthConstants.OAUTH20_SERVICE_NAME, service.getName());
+        session.setAttribute(OAuthConstants.OAUTH20_STATE, state);
+
+        final String callbackAuthorizeUrl = request.getRequestURL().toString()
+                .replace("/" + OAuthConstants.AUTHORIZE_URL, "/" + OAuthConstants.CALLBACK_AUTHORIZE_URL);
+        LOGGER.debug("{} : {}", OAuthConstants.CALLBACK_AUTHORIZE_URL, callbackAuthorizeUrl);
+
+        final String loginUrlWithService = OAuthUtils.addParameter(loginUrl, OAuthConstants.SERVICE,
+                callbackAuthorizeUrl);
+        LOGGER.debug("loginUrlWithService : {}", loginUrlWithService);
         return OAuthUtils.redirectTo(loginUrlWithService);
     }
 }

@@ -34,7 +34,6 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.transcoders.Transcoder;
 import org.jasig.cas.authentication.ImmutableAuthentication;
 import org.jasig.cas.authentication.MutableAuthentication;
-import org.jasig.cas.authentication.principal.SamlService;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
 import org.jasig.cas.authentication.principal.SimpleWebApplicationServiceImpl;
 import org.jasig.cas.ticket.ServiceTicketImpl;
@@ -43,7 +42,6 @@ import org.jasig.cas.ticket.registry.support.kryo.serial.HardTimeoutExpirationPo
 import org.jasig.cas.ticket.registry.support.kryo.serial.ImmutableAuthenticationSerializer;
 import org.jasig.cas.ticket.registry.support.kryo.serial.MultiTimeUseOrTimeoutExpirationPolicySerializer;
 import org.jasig.cas.ticket.registry.support.kryo.serial.MutableAuthenticationSerializer;
-import org.jasig.cas.ticket.registry.support.kryo.serial.SamlServiceSerializer;
 import org.jasig.cas.ticket.registry.support.kryo.serial.SimplePrincipalSerializer;
 import org.jasig.cas.ticket.registry.support.kryo.serial.SimpleWebApplicationServiceSerializer;
 import org.jasig.cas.ticket.registry.support.kryo.serial.TimeoutExpirationPolicySerializer;
@@ -62,11 +60,10 @@ import org.slf4j.LoggerFactory;
  * suited for efficient serialization of tickets.
  *
  * @author Marvin S. Addison
- * @version $Revision: $
  */
 public class KryoTranscoder implements Transcoder<Object> {
 
-    /** Kryo serializer */
+    /** Kryo serializer. */
     private final Kryo kryo = new Kryo();
 
     /** Logging instance. */
@@ -119,7 +116,6 @@ public class KryoTranscoder implements Transcoder<Object> {
         kryo.register(
                 RememberMeDelegatingExpirationPolicy.class,
                 new FieldSerializer(kryo, RememberMeDelegatingExpirationPolicy.class));
-        kryo.register(SamlService.class, new SamlServiceSerializer(kryo, fieldHelper));
         kryo.register(ServiceTicketImpl.class);
         kryo.register(SimplePrincipal.class, new SimplePrincipalSerializer(kryo));
         kryo.register(SimpleWebApplicationServiceImpl.class, new SimpleWebApplicationServiceSerializer(kryo));
@@ -210,7 +206,7 @@ public class KryoTranscoder implements Transcoder<Object> {
                 }
                 if (rootCause instanceof BufferOverflowException) {
                     buffer = ByteBuffer.allocate(bufferSize * ++factor);
-                    logger.warn("Buffer overflow while encoding " + o);
+                    logger.warn("Buffer overflow while encoding {}", o);
                 } else {
                     throw e;
                 }

@@ -21,6 +21,7 @@ package org.jasig.cas.adaptors.ldap;
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 import org.jasig.cas.util.LdapUtils;
+import org.springframework.ldap.NamingSecurityException;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairCallbackHandler;
@@ -47,9 +48,8 @@ import java.util.List;
  *  authenticated context such as an administrator username/password or client
  *  certificate.  This step is suitable for LDAP connection pooling to improve
  *  efficiency and performance.
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
  * @since 3.0.3
  */
 public class BindLdapAuthenticationHandler extends AbstractLdapUsernamePasswordAuthenticationHandler {
@@ -77,35 +77,37 @@ public class BindLdapAuthenticationHandler extends AbstractLdapUsernamePasswordA
     /** Boolean of whether multiple accounts are allowed. */
     private boolean allowMultipleAccounts;
 
-    protected final boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials) throws AuthenticationException {
+    @Override
+    protected final boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials)
+            throws AuthenticationException {
 
         final List<String> cns = new ArrayList<String>();
-        
+
         final SearchControls searchControls = getSearchControls();
-        
+
         final String base = this.searchBase;
         final String transformedUsername = getPrincipalNameTransformer().transform(credentials.getUsername());
         final String filter = LdapUtils.getFilterWithValues(getFilter(), transformedUsername);
-        this.getLdapTemplate().search(
-            new SearchExecutor() {
+        this.getLdapTemplate().search(new SearchExecutor() {
 
-                public NamingEnumeration executeSearch(final DirContext context) throws NamingException {
-                    return context.search(base, filter, searchControls);
-                }
-            },
-            new NameClassPairCallbackHandler(){
+            @Override
+            public NamingEnumeration executeSearch(final DirContext context) throws NamingException {
+                return context.search(base, filter, searchControls);
+            }
+        }, new NameClassPairCallbackHandler() {
 
-                public void handleNameClassPair(final NameClassPair nameClassPair) {
-                    cns.add(nameClassPair.getNameInNamespace());
-                }
-            });
-        
+            @Override
+            public void handleNameClassPair(final NameClassPair nameClassPair) {
+                cns.add(nameClassPair.getNameInNamespace());
+            }
+        });
+
         if (cns.isEmpty()) {
-            log.info("Search for " + filter + " returned 0 results.");
+            logger.info("Search for {} returned 0 results.", filter);
             return false;
         }
         if (cns.size() > 1 && !this.allowMultipleAccounts) {
-            log.warn("Search for " + filter + " returned multiple results, which is not allowed.");
+            logger.warn("Search for {} returned multiple results, which is not allowed.", filter);
             return false;
         }
 
@@ -113,18 +115,18 @@ public class BindLdapAuthenticationHandler extends AbstractLdapUsernamePasswordA
             DirContext test = null;
             String finalDn = composeCompleteDnToCheck(dn, credentials);
             try {
-                this.log.debug("Performing LDAP bind with credential: " + dn);
-                test = this.getContextSource().getContext(
-                    finalDn,
-                    getPasswordEncoder().encode(credentials.getPassword()));
+                logger.debug("Performing LDAP bind with credential: {}", dn);
+                test = this.getContextSource().getContext(finalDn,
+                        getPasswordEncoder().encode(credentials.getPassword()));
 
                 if (test != null) {
                     return true;
                 }
+            } catch (final NamingSecurityException e) {
+                logger.info("Failed to authenticate user {} with error {}", credentials.getUsername(), e.getMessage());
+                throw handleLdapError(e);
             } catch (final Exception e) {
-                if (this.log.isErrorEnabled())
-                    this.log.error(e.getMessage(), e);
-
+                logger.error(e.getMessage(), e);
                 throw handleLdapError(e);
             } finally {
                 LdapUtils.closeContext(test);
@@ -134,8 +136,7 @@ public class BindLdapAuthenticationHandler extends AbstractLdapUsernamePasswordA
         return false;
     }
 
-    protected String composeCompleteDnToCheck(final String dn,
-        final UsernamePasswordCredentials credentials) {
+    protected String composeCompleteDnToCheck(final String dn, final UsernamePasswordCredentials credentials) {
         return dn;
     }
 
@@ -182,7 +183,7 @@ public class BindLdapAuthenticationHandler extends AbstractLdapUsernamePasswordA
     }
 
     /**
-     * Method to return the timeout. 
+     * Method to return the timeout.
      * @return the timeout.
      */
     protected int getTimeout() {

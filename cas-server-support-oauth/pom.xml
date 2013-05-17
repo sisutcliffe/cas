@@ -24,10 +24,9 @@
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jasig.cas</groupId>
 	<artifactId>cas-server-support-oauth</artifactId>
 	<packaging>jar</packaging>
-	<name>Jasig CAS OAuth Support</name>
+	<name>Jasig CAS OAuth Server Support</name>
 
   <developers>
     <developer>
@@ -48,11 +47,15 @@
 			<artifactId>cas-server-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>org.scribe</groupId>
-			<artifactId>scribe-up</artifactId>
-			<version>1.1.0</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.0.6</version>
 		</dependency>
     </dependencies>
+
+  <properties>
+    <cs.dir>${project.parent.basedir}</cs.dir>
+  </properties>
 </project>

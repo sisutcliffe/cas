@@ -19,16 +19,18 @@
 
 package org.jasig.cas.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * @author Daniel Frett
- * @version $Revision$ $Date$
  * @since 3.4.11
  */
-public final class LdapUtilTests extends TestCase {
+public final class LdapUtilTests {
 
-     public void testEncoding() {
+    @Test
+    public void testEncoding() {
         final String filter = "cn=%u";
         assertEquals("cn=test\\+user@example.com", LdapUtils.getFilterWithValues(filter, "test+user@example.com"));
     }

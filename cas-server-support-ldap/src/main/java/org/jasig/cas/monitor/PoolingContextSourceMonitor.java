@@ -21,8 +21,6 @@ package org.jasig.cas.monitor;
 import javax.naming.directory.DirContext;
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ldap.pool.DirContextType;
 import org.springframework.ldap.pool.factory.PoolingContextSource;
 
@@ -33,8 +31,6 @@ import org.springframework.ldap.pool.factory.PoolingContextSource;
  * @since 3.5.0
  */
 public class PoolingContextSourceMonitor extends AbstractPoolMonitor {
-    /** Logger instance. */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /** Pool to observe. */
     @NotNull
@@ -47,6 +43,7 @@ public class PoolingContextSourceMonitor extends AbstractPoolMonitor {
 
 
     /** {@inheritDoc} */
+    @Override
     protected StatusCode checkPool() throws Exception {
         final boolean success;
         DirContext ctxt = null;
@@ -63,12 +60,14 @@ public class PoolingContextSourceMonitor extends AbstractPoolMonitor {
 
 
     /** {@inheritDoc} */
+    @Override
     protected int getIdleCount() {
         return poolingContextSource.getNumIdle();
     }
 
 
     /** {@inheritDoc} */
+    @Override
     protected int getActiveCount() {
         return poolingContextSource.getNumActive();
     }

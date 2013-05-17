@@ -18,7 +18,11 @@
  */
 package org.jasig.cas.authentication.handler.support;
 
-import org.jasig.cas.authentication.handler.*;
+import org.jasig.cas.authentication.handler.AuthenticationException;
+import org.jasig.cas.authentication.handler.NoOpPrincipalNameTransformer;
+import org.jasig.cas.authentication.handler.PasswordEncoder;
+import org.jasig.cas.authentication.handler.PlainTextPasswordEncoder;
+import org.jasig.cas.authentication.handler.PrincipalNameTransformer;
 import org.jasig.cas.authentication.principal.Credentials;
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 
@@ -27,9 +31,9 @@ import javax.validation.constraints.NotNull;
 /**
  * Abstract class to override supports so that we don't need to duplicate the
  * check for UsernamePasswordCredentials.
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
+
  * @since 3.0
  * <p>
  * This is a published and supported CAS Server 3 API.
@@ -62,10 +66,13 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
     private PrincipalNameTransformer principalNameTransformer = new NoOpPrincipalNameTransformer();
 
     /**
+     * {@inheritDoc}
      * Method automatically handles conversion to UsernamePasswordCredentials
      * and delegates to abstract authenticateUsernamePasswordInternal so
      * subclasses do not need to cast.
+     * @return true if credentials are authentic, false otherwise.
      */
+    @Override
     protected final boolean doAuthentication(final Credentials credentials)
         throws AuthenticationException {
         return authenticateUsernamePasswordInternal((UsernamePasswordCredentials) credentials);
@@ -74,7 +81,7 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
     /**
      * Abstract convenience method that assumes the credentials passed in are a
      * subclass of UsernamePasswordCredentials.
-     * 
+     *
      * @param credentials the credentials representing the Username and Password
      * presented to CAS
      * @return true if the credentials are authentic, false otherwise.
@@ -86,7 +93,7 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
 
     /**
      * Method to return the PasswordEncoder to be used to encode passwords.
-     * 
+     *
      * @return the PasswordEncoder associated with this class.
      */
     protected final PasswordEncoder getPasswordEncoder() {
@@ -99,7 +106,7 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
 
     /**
      * Method to set the class to support.
-     * 
+     *
      * @param classToSupport the class we want this handler to support
      * explicitly.
      */
@@ -110,7 +117,7 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
     /**
      * Method to set whether this handler will support subclasses of the
      * supported class.
-     * 
+     *
      * @param supportSubClasses boolean of whether to support subclasses or not.
      */
     public final void setSupportSubClasses(final boolean supportSubClasses) {
@@ -119,7 +126,7 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
 
     /**
      * Sets the PasswordEncoder to be used with this class.
-     * 
+     *
      * @param passwordEncoder the PasswordEncoder to use when encoding
      * passwords.
      */
@@ -132,9 +139,11 @@ public abstract class AbstractUsernamePasswordAuthenticationHandler extends
     }
 
     /**
+     * {@inheritDoc}
      * @return true if the credentials are not null and the credentials class is
      * equal to the class defined in classToSupport.
      */
+    @Override
     public final boolean supports(final Credentials credentials) {
         return credentials != null
             && (this.classToSupport.equals(credentials.getClass()) || (this.classToSupport

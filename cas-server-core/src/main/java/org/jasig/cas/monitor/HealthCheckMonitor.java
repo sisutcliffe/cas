@@ -47,19 +47,26 @@ public class HealthCheckMonitor implements Monitor<HealthStatus> {
     }
 
     /** {@inheritDoc} */
+    @Override
     public String getName() {
         return HealthCheckMonitor.class.getSimpleName();
     }
 
     /** {@inheritDoc} */
+    @Override
     public HealthStatus observe() {
         final Map<String, Status> results = new LinkedHashMap<String, Status>(this.monitors.size());
         StatusCode code = StatusCode.UNKNOWN;
         Status result;
         for (final Monitor monitor : this.monitors) {
-            result = monitor.observe();
-            if (result.getCode().value() > code.value()) {
-                code = result.getCode();
+            try {
+                result = monitor.observe();
+                if (result.getCode().value() > code.value()) {
+                    code = result.getCode();
+                }
+            } catch (final Exception e) {
+                code = StatusCode.ERROR;
+                result = new Status(code, e.getClass().getSimpleName() + ": " + e.getMessage());
             }
             results.put(monitor.getName(), result);
         }

@@ -18,29 +18,31 @@
  */
 package org.jasig.cas.support.spnego.authentication.handler.support;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.jasig.cas.authentication.handler.AuthenticationException;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 import org.jasig.cas.support.spnego.MockJCSIFAuthentication;
-import org.jasig.cas.support.spnego.authentication.handler.support.JCIFSSpnegoAuthenticationHandler;
 import org.jasig.cas.support.spnego.authentication.principal.SpnegoCredentials;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Marc-Antoine Garrigue
  * @author Arnaud Lesueur
- * @version $Id$
  * @since 3.1
- * 
+ *
  */
-public class JCSIFSpnegoAuthenticationHandlerTests extends TestCase {
+public class JCSIFSpnegoAuthenticationHandlerTests {
     private JCIFSSpnegoAuthenticationHandler authenticationHandler;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         this.authenticationHandler = new JCIFSSpnegoAuthenticationHandler();
     }
 
+    @Test
     public void testSuccessfulAuthenticationWithDomainName() throws AuthenticationException {
         final SpnegoCredentials credentials = new SpnegoCredentials(new byte[] {0, 1, 2});
         this.authenticationHandler.setPrincipalWithDomainName(true);
@@ -50,6 +52,7 @@ public class JCSIFSpnegoAuthenticationHandlerTests extends TestCase {
         assertNotNull(credentials.getNextToken());
     }
 
+    @Test
     public void testSuccessfulAuthenticationWithoutDomainName() throws AuthenticationException {
         final SpnegoCredentials credentials = new SpnegoCredentials(new byte[] {0, 1, 2});
         this.authenticationHandler.setPrincipalWithDomainName(false);
@@ -59,24 +62,27 @@ public class JCSIFSpnegoAuthenticationHandlerTests extends TestCase {
         assertNotNull(credentials.getNextToken());
     }
 
+    @Test
     public void testUnsuccessfulAuthentication() {
         final SpnegoCredentials credentials = new SpnegoCredentials(new byte[] {0, 1, 2});
         this.authenticationHandler.setAuthentication(new MockJCSIFAuthentication(false));
         try {
             this.authenticationHandler.authenticate(credentials);
             fail("An AuthenticationException should have been thrown");
-        } catch (AuthenticationException e) {
+        } catch (final AuthenticationException e) {
             assertNull(credentials.getNextToken());
             assertNull(credentials.getPrincipal());
         }
     }
 
+    @Test
     public void testSupports() {
         assertFalse(this.authenticationHandler.supports(null));
         assertTrue(this.authenticationHandler.supports(new SpnegoCredentials(new byte[] {0, 1, 2})));
         assertFalse(this.authenticationHandler.supports(new UsernamePasswordCredentials()));
     }
 
+    @Test
     public void testGetSimpleCredentials() {
         String myNtlmUser = "DOMAIN\\Username";
         String myNtlmUserWithNoDomain = "Username";

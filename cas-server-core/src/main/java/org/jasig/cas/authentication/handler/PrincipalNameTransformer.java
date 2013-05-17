@@ -21,13 +21,12 @@ package org.jasig.cas.authentication.handler;
 
 /**
  * @author Howard Gilbert
- * @version $Revision$ $Date$
  * @since 3.3.6
  */
 public interface PrincipalNameTransformer {
 
     /**
-     * Transform the string typed into the login form into a tentative Principal Name to be 
+     * Transform the string typed into the login form into a tentative Principal Name to be
      * validated by a specific type of Authentication Handler.
      *
      * <p>The Principal Name eventually assigned by the CredentialsToPrincipalResolver may
@@ -40,6 +39,6 @@ public interface PrincipalNameTransformer {
      * @param formUserId The raw userid typed into the login form
      * @return the string that the Authentication Handler should lookup in the backend system
      */
-    public String transform(String formUserId);
+    String transform(String formUserId);
 }
 

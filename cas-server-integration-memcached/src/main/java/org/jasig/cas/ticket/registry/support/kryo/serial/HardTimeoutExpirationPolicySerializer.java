@@ -28,10 +28,10 @@ import org.jasig.cas.ticket.support.HardTimeoutExpirationPolicy;
  * Serializer for {@link HardTimeoutExpirationPolicy}.
  *
  * @author Marvin S. Addison
- * @version $Revision: $
  */
 public final class HardTimeoutExpirationPolicySerializer extends SimpleSerializer<HardTimeoutExpirationPolicy> {
 
+    /** FieldHelper instance. **/
     protected final FieldHelper fieldHelper;
 
     public HardTimeoutExpirationPolicySerializer(final FieldHelper helper) {

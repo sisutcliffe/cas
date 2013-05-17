@@ -44,12 +44,11 @@ import org.springframework.webflow.execution.RequestContext;
  * <li>else add a WWW-Authenticate response header and a 401 response status,
  * then return <code>success()</code></li>
  * </ul>
- * 
+ *
  * @see <a href='http://ietfreport.isoc.org/idref/rfc4559/#page-2'>RFC 4559</a>
  * @author Arnaud Lesueur
  * @author Marc-Antoine Garrigue
  * @author Scott Battaglia
- * @version $Revision$ $Date$
  * @since 3.1
  */
 public final class SpnegoNegociateCredentialsAction extends AbstractAction {
@@ -63,28 +62,29 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
 
     private String messageBeginPrefix = constructMessagePrefix();
 
-    protected Event doExecute(RequestContext context) {
+    @Override
+    protected Event doExecute(final RequestContext context) {
         final HttpServletRequest request = WebUtils
-            .getHttpServletRequest(context);
+                .getHttpServletRequest(context);
         final HttpServletResponse response = WebUtils
-            .getHttpServletResponse(context);
+                .getHttpServletResponse(context);
         final String authorizationHeader = request
-            .getHeader(SpnegoConstants.HEADER_AUTHORIZATION);
+                .getHeader(SpnegoConstants.HEADER_AUTHORIZATION);
         final String userAgent = request
-            .getHeader(SpnegoConstants.HEADER_USER_AGENT);
+                .getHeader(SpnegoConstants.HEADER_USER_AGENT);
 
         if (StringUtils.hasText(userAgent) && isSupportedBrowser(userAgent) && isInNetwork(request.getRemoteAddr())) {
             if (!StringUtils.hasText(authorizationHeader)
-                || !authorizationHeader.startsWith(this.messageBeginPrefix)
-                || authorizationHeader.length() <= this.messageBeginPrefix
+                    || !authorizationHeader.startsWith(this.messageBeginPrefix)
+                    || authorizationHeader.length() <= this.messageBeginPrefix
                     .length()) {
                 if (logger.isDebugEnabled()) {
                     logger
-                        .debug("Authorization header not found. Sending WWW-Authenticate header");
+                    .debug("Authorization header not found. Sending WWW-Authenticate header");
                 }
                 response.setHeader(SpnegoConstants.HEADER_AUTHENTICATE,
-                    this.ntlm ? SpnegoConstants.NTLM
-                        : SpnegoConstants.NEGOTIATE);
+                        this.ntlm ? SpnegoConstants.NTLM
+                                : SpnegoConstants.NEGOTIATE);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 // The responseComplete flag tells the pausing view-state not to render the response
                 // because another object has taken care of it.
@@ -107,6 +107,7 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
         this.netmask = netmask;
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (this.supportedBrowser == null) {
             this.supportedBrowser = new ArrayList<String>();
@@ -121,7 +122,7 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
 
     protected String constructMessagePrefix() {
         return (this.ntlm ? SpnegoConstants.NTLM : SpnegoConstants.NEGOTIATE)
-            + " ";
+                + " ";
     }
 
     protected boolean isSupportedBrowser(final String userAgent) {

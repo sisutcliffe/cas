@@ -26,9 +26,8 @@ package org.jasig.cas.authentication.principal;
  * Implementation extracts the username from the Credentials provided and
  * constructs a new SimplePrincipal with the unique id set to the username.
  * </p>
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision: 1.2 $ $Date: 2007/01/22 20:35:26 $
  * @since 3.0
  * @see org.jasig.cas.authentication.principal.SimplePrincipal
  */
@@ -41,9 +40,12 @@ public final class UsernamePasswordCredentialsToPrincipalResolver extends
     }
 
     /**
+     * {@inheritDoc}
      * Return true if Credentials are UsernamePasswordCredentials, false
      * otherwise.
+     * @return true, if the credentials are supported by this resolver
      */
+    @Override
     public boolean supports(final Credentials credentials) {
         return credentials != null
             && UsernamePasswordCredentials.class.isAssignableFrom(credentials

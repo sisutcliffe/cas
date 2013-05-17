@@ -28,14 +28,12 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Adaptor class to adapt the legacy CAS TrustHandler to the new
- * AuthenticationHandler
- * 
+ * AuthenticationHandler.
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
  * @since 3.0
  */
-public final class LegacyTrustHandlerAdaptorAuthenticationHandler implements
-    AuthenticationHandler {
+public final class LegacyTrustHandlerAdaptorAuthenticationHandler implements AuthenticationHandler {
 
     @NotNull
     private TrustHandler trustHandler;
@@ -43,13 +41,11 @@ public final class LegacyTrustHandlerAdaptorAuthenticationHandler implements
     public boolean authenticate(final Credentials credentials) {
         final LegacyCasTrustedCredentials casCredentials = (LegacyCasTrustedCredentials) credentials;
 
-        return StringUtils.hasText(this.trustHandler.getUsername(casCredentials
-            .getServletRequest()));
+        return StringUtils.hasText(this.trustHandler.getUsername(casCredentials.getServletRequest()));
     }
 
     public boolean supports(final Credentials credentials) {
-        return credentials != null
-            && LegacyCasTrustedCredentials.class.equals(credentials.getClass());
+        return credentials != null && LegacyCasTrustedCredentials.class.equals(credentials.getClass());
     }
 
     /**

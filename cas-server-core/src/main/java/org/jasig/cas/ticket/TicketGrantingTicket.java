@@ -19,6 +19,7 @@
 package org.jasig.cas.ticket;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jasig.cas.authentication.Authentication;
 import org.jasig.cas.authentication.principal.Service;
@@ -27,9 +28,9 @@ import org.jasig.cas.authentication.principal.Service;
  * Interface for a ticket granting ticket. A TicketGrantingTicket is the main
  * access into the CAS service layer. Without a TicketGrantingTicket, a user of
  * CAS cannot do anything.
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
+
  * @since 3.0
  */
 public interface TicketGrantingTicket extends Ticket {
@@ -39,16 +40,18 @@ public interface TicketGrantingTicket extends Ticket {
 
     /**
      * Method to retrieve the authentication.
-     * 
+     *
      * @return the authentication
      */
     Authentication getAuthentication();
 
     /**
      * Grant a ServiceTicket for a specific service.
-     * 
+     *
      * @param id The unique identifier for this ticket.
      * @param service The service for which we are granting a ticket
+     * @param expirationPolicy the expiration policy.
+     * @param credentialsProvided if the credentials are provided.
      * @return the service ticket granted to a specific service for the
      * principal of the TicketGrantingTicket
      */
@@ -56,16 +59,26 @@ public interface TicketGrantingTicket extends Ticket {
         ExpirationPolicy expirationPolicy, boolean credentialsProvided);
 
     /**
-     * Explicitly expire a ticket.  This method will log out of any service associated with the
-     * Ticket Granting Ticket.
-     * 
+     * Gets an immutable map of service ticket and services accessed by this ticket-granting ticket.
+     *
+     * @return an immutable map of service ticket and services accessed by this ticket-granting ticket.
+    */
+    Map<String, Service> getServices();
+
+    /**
+     * Remove all services of the TGT (at logout).
      */
-    void expire();
+    void removeAllServices();
+
+    /**
+     * Mark a ticket as expired.
+     */
+    void markTicketExpired();
 
     /**
      * Convenience method to determine if the TicketGrantingTicket is the root
      * of the hierarchy of tickets.
-     * 
+     *
      * @return true if it has no parent, false otherwise.
      */
     boolean isRoot();
@@ -73,7 +86,7 @@ public interface TicketGrantingTicket extends Ticket {
     /**
      * Method to retrieve the chained list of Authentications for this
      * TicketGrantingTicket.
-     * 
+     *
      * @return the list of principals
      */
     List<Authentication> getChainedAuthentications();

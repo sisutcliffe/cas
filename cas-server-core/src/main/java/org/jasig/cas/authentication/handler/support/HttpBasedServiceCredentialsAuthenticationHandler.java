@@ -35,9 +35,9 @@ import javax.validation.constraints.NotNull;
  * This class is concerned with ensuring that the protocol is HTTPS and that a
  * response is returned. The SSL handshake that occurs automatically by opening
  * a connection does the heavy process of authenticating.
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
+
  * @since 3.0
  */
 public final class HttpBasedServiceCredentialsAuthenticationHandler implements AuthenticationHandler {
@@ -49,9 +49,9 @@ public final class HttpBasedServiceCredentialsAuthenticationHandler implements A
     private boolean requireSecure = true;
 
     /** Log instance. */
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /** Instance of Apache Commons HttpClient */
+    /** Instance of Apache Commons HttpClient. */
     @NotNull
     private HttpClient httpClient;
 
@@ -60,37 +60,38 @@ public final class HttpBasedServiceCredentialsAuthenticationHandler implements A
         if (this.requireSecure
             && !serviceCredentials.getCallbackUrl().getProtocol().equals(
                 PROTOCOL_HTTPS)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Authentication failed because url was not secure.");
-            }
+            logger.debug("Authentication failed because url was not secure.");
             return false;
         }
-        log
-            .debug("Attempting to resolve credentials for "
-                + serviceCredentials);
+        logger.debug("Attempting to resolve credentials for {}", serviceCredentials);
 
         return this.httpClient.isValidEndPoint(serviceCredentials
             .getCallbackUrl());
     }
 
     /**
+     * {@inheritDoc}
      * @return true if the credentials provided are not null and the credentials
      * are a subclass of (or equal to) HttpBasedServiceCredentials.
      */
+    @Override
     public boolean supports(final Credentials credentials) {
         return credentials != null
             && HttpBasedServiceCredentials.class.isAssignableFrom(credentials
                 .getClass());
     }
 
-    /** Sets the HttpClient which will do all of the connection stuff. */
+    /**
+     * Sets the HttpClient which will do all of the connection stuff.
+     * @param httpClient http client instance to use
+     **/
     public void setHttpClient(final HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
     /**
      * Set whether a secure url is required or not.
-     * 
+     *
      * @param requireSecure true if its required, false if not. Default is true.
      */
     public void setRequireSecure(final boolean requireSecure) {

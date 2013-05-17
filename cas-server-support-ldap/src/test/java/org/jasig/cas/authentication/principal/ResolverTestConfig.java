@@ -18,26 +18,20 @@
  */
 package org.jasig.cas.authentication.principal;
 
-
 /**
  * Container for test properties used by LDAP resolver.
  *
  * @author Marvin S. Addison
- * @version $Revision$ $Date$
  * @since 3.0
  *
  */
 public class ResolverTestConfig {
 
     private String existsCredential;
-
     private String existsPrincipal;
-    
     private String notExistsCredential;
-    
     private String tooManyCredential;
 
-    
     /**
      * @return Returns the existsCredential.
      */
@@ -45,22 +39,19 @@ public class ResolverTestConfig {
         return this.existsCredential;
     }
 
-    
     /**
      * @param existsCredential The existsCredential to set.
      */
-    public void setExistsCredential(String existsCredential) {
+    public void setExistsCredential(final String existsCredential) {
         this.existsCredential = existsCredential;
     }
-
 
     /**
      * @param existsPrincipal The existsPrincipal to set.
      */
-    public void setExistsPrincipal(String existsPrincipal) {
+    public void setExistsPrincipal(final String existsPrincipal) {
         this.existsPrincipal = existsPrincipal;
     }
-
 
     /**
      * @return Returns the existsPrincipal.
@@ -69,7 +60,6 @@ public class ResolverTestConfig {
         return this.existsPrincipal;
     }
 
-    
     /**
      * @return Returns the notExistsCredential.
      */
@@ -77,15 +67,13 @@ public class ResolverTestConfig {
         return this.notExistsCredential;
     }
 
-    
     /**
      * @param notExistsCredential The notExistsCredential to set.
      */
-    public void setNotExistsCredential(String notExistsCredential) {
+    public void setNotExistsCredential(final String notExistsCredential) {
         this.notExistsCredential = notExistsCredential;
     }
 
-    
     /**
      * @return Returns the tooManyCredential.
      */
@@ -93,11 +81,10 @@ public class ResolverTestConfig {
         return this.tooManyCredential;
     }
 
-    
     /**
      * @param tooManyCredential The tooManyCredential to set.
      */
-    public void setTooManyCredential(String tooManyCredential) {
+    public void setTooManyCredential(final String tooManyCredential) {
         this.tooManyCredential = tooManyCredential;
     }
 }

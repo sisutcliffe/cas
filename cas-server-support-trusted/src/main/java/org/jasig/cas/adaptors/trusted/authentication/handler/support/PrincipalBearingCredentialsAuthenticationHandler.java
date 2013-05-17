@@ -26,27 +26,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  * AuthenticationHandler which authenticates Principal-bearing credentials.
- * Authentication must have occured at the time the Principal-bearing
+ * Authentication must have occurred at the time the Principal-bearing
  * credentials were created, so we perform no further authentication. Thus
  * merely by being presented a PrincipalBearingCredentials, this handler returns
  * true.
- * 
+ *
  * @author Andrew Petro
- * @version $Revision$ $Date$
  * @since 3.0.5
  */
-public final class PrincipalBearingCredentialsAuthenticationHandler implements
-    AuthenticationHandler {
+public final class PrincipalBearingCredentialsAuthenticationHandler implements AuthenticationHandler {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Override
     public boolean authenticate(final Credentials credentials) {
-        if (log.isDebugEnabled()) {
-            log.debug("Trusting credentials for: " + credentials);
-        }
+        logger.debug("Trusting credentials for: {}", credentials);
         return true;
     }
 
+    @Override
     public boolean supports(final Credentials credentials) {
         return credentials.getClass().equals(PrincipalBearingCredentials.class);
     }

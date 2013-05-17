@@ -30,13 +30,12 @@ import javax.validation.constraints.Size;
 
 /**
  * Authentication Handler to authenticate a user against a RADIUS server.
- * 
+ *
  * @author Scott Battaglia
- * @version $Revision$ $Date$
  * @since 3.0
  */
 public class RadiusAuthenticationHandler extends
-    AbstractUsernamePasswordAuthenticationHandler {
+AbstractUsernamePasswordAuthenticationHandler {
 
     /** Array of RADIUS servers to authenticate against. */
     @NotNull
@@ -55,25 +54,25 @@ public class RadiusAuthenticationHandler extends
      */
     private boolean failoverOnAuthenticationFailure;
 
-    protected final boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials) throws AuthenticationException {
+    @Override
+    protected final boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials)
+                                                    throws AuthenticationException {
 
         for (final RadiusServer radiusServer : this.servers) {
             try {
                 final boolean response = radiusServer.authenticate(credentials);
 
                 if (response
-                    || (!response && !this.failoverOnAuthenticationFailure)) {
+                        || !response && !this.failoverOnAuthenticationFailure) {
                     return response;
                 }
 
-                log
-                    .debug("Failing over to next handler because failoverOnAuthenticationFailure is set to true.");
-            } catch (Exception e) {
+                logger.debug("Failing over to next handler because failoverOnAuthenticationFailure is set to true.");
+            } catch (final Exception e) {
                 if (!this.failoverOnException) {
-                    log
-                        .warn("Failover disabled.  Returning false for authentication request.");
+                    logger.warn("Failover disabled. Returning false for authentication request.");
                 } else {
-                    log.warn("Failover enabled.  Trying next RadiusServer.");
+                    logger.warn("Failover enabled. Trying next RadiusServer.");
                 }
             }
         }
@@ -84,19 +83,19 @@ public class RadiusAuthenticationHandler extends
     /**
      * Determines whether to fail over to the next configured RadiusServer if
      * there was an authentication failure.
-     * 
+     *
      * @param failoverOnAuthenticationFailure boolean on whether to failover or
      * not.
      */
     public void setFailoverOnAuthenticationFailure(
-        final boolean failoverOnAuthenticationFailure) {
+            final boolean failoverOnAuthenticationFailure) {
         this.failoverOnAuthenticationFailure = failoverOnAuthenticationFailure;
     }
 
     /**
      * Determines whether to fail over to the next configured RadiusServer if
      * there was an exception.
-     * 
+     *
      * @param failoverOnException boolean on whether to failover or not.
      */
     public void setFailoverOnException(final boolean failoverOnException) {

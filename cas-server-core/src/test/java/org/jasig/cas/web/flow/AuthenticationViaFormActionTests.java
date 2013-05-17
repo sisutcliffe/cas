@@ -27,19 +27,16 @@ import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 import org.jasig.cas.web.bind.CredentialsBinder;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.validation.BindException;
 import org.springframework.web.util.CookieGenerator;
 import org.springframework.webflow.context.servlet.ServletExternalContext;
-import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.test.MockRequestContext;
 
 /**
  * @author Scott Battaglia
- * @version $Revision$ $Date$
  * @since 3.0.4
  */
 public class AuthenticationViaFormActionTests extends
@@ -160,7 +157,7 @@ public class AuthenticationViaFormActionTests extends
         request.addParameter("service", "test");
         request.addParameter("username", "test");
         request.addParameter("password", "test");
-        
+
         context.setExternalContext(new ServletExternalContext(
             new MockServletContext(), request, new MockHttpServletResponse()));
         context.getFlowScope().put("service", TestUtils.getService("test"));
@@ -239,14 +236,14 @@ public class AuthenticationViaFormActionTests extends
 
         final CredentialsBinder cb = new CredentialsBinder(){
 
-            public void bind(HttpServletRequest request, Credentials credentials) {
+            public void bind(final HttpServletRequest request, final Credentials credentials) {
                 ((UsernamePasswordCredentials) credentials)
                     .setUsername("test2");
                 ((UsernamePasswordCredentials) credentials)
                     .setPassword("test2");
             }
 
-            public boolean supports(Class<?> clazz) {
+            public boolean supports(final Class<?> clazz) {
                 return true;
             }
 
