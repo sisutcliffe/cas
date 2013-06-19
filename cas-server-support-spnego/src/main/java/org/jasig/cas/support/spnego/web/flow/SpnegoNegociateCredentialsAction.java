@@ -140,10 +140,14 @@ public final class SpnegoNegociateCredentialsAction extends AbstractAction {
             byte[] client = InetAddress.getByName(requestor).getAddress();
             byte[] netmask = InetAddress.getByName(this.netmask).getAddress();
 
-            for (int i = 0; i < server.length; i++)
-               if ((server[i] & netmask[i]) != (client[i] & netmask[i]))
+            for (int i = 0; i < server.length; i++) {
+               if ((server[i] & netmask[i]) != (client[i] & netmask[i])) {
                   return false;
-        } catch(UnknownHostException e) {}
+               }
+            }
+        } catch(final UnknownHostException e) {
+            logger.info(e.getMessage());
+        }
         return true;
     }
 }
