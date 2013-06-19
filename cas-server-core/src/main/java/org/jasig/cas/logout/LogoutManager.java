@@ -18,9 +18,8 @@
  */
 package org.jasig.cas.logout;
 
-import java.util.Map;
+import java.util.List;
 
-import org.jasig.cas.authentication.principal.Service;
 import org.jasig.cas.ticket.TicketGrantingTicket;
 
 /**
@@ -32,11 +31,18 @@ import org.jasig.cas.ticket.TicketGrantingTicket;
 public interface LogoutManager {
 
     /**
-     * Perform a back channel logout for a given ticket granting ticket and returns the services
-     * eligible to a front channel logout.
+     * Perform a back channel logout for a given ticket granting ticket and returns all the logout requests.
      *
      * @param ticket a given ticket granting ticket.
-     * @return an interator on front channel logout services
+     * @return all logout requests.
      */
-    Map<String, Service> performLogout(TicketGrantingTicket ticket);
+    List<LogoutRequest> performLogout(TicketGrantingTicket ticket);
+
+    /**
+     * Create a logout message for front channel logout.
+     *
+     * @param logoutRequest the logout request.
+     * @return a front SAML logout message.
+     */
+    String createFrontChannelLogoutMessage(LogoutRequest logoutRequest);
 }
